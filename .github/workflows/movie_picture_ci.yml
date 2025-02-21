@@ -1,0 +1,55 @@
+name: Continuous Integration Pipeline for Movie Picture Pipeline..
+
+on:
+  # pull_requests:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'starter/frontend'
+
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Run ESlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd starter/frontend
+          npm ci
+
+      - name: Run eslint
+        run: |
+          cd starter/frontend
+          npm run lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd starter/frontend
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd starter/frontend
+          CI=true npm test
