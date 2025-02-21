@@ -5,7 +5,7 @@ on:
   #   branches:
   #     - main
   #   paths:
-  #     - 'backend/**'
+  #     - 'starter/backend/**'
   workflow_dispatch:  # Allows manual execution
 
 env:
