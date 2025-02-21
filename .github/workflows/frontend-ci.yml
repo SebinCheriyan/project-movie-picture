@@ -1,4 +1,4 @@
-name: Frontend CI workflow.
+name: Frontend Continuous Integration
 
 on:
   # pull_request:

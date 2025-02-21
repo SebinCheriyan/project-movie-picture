@@ -1,4 +1,4 @@
-name: Backend CD Workflow
+name: Backend Continuous Deployment
 
 on:
   # push:
