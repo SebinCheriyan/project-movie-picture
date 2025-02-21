@@ -1,4 +1,4 @@
-name: Frontend CD
+name: Frontend CD Workflow
 
 on:
   # push:
@@ -60,6 +60,6 @@ jobs:
 
       - name: Update Image Tag in Kustomize
         run: |
-          cd frontend/k8s
+          cd starter/frontend/k8s
           kustomize edit set image frontend=${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           kustomize build | kubectl apply -f -

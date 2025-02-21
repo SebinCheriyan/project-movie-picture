@@ -12,6 +12,7 @@ env:
   AWS_REGION: us-east-1
   AWS_ROLE: arn:aws:iam::352026621605:user/github-action-user
   ECR_REPOSITORY: 352026621605.dkr.ecr.us-east-1.amazonaws.com/backend
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build:
@@ -34,12 +35,10 @@ jobs:
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REPOSITORY }}
 
       - name: Build and Push Docker Image
-        env:
-          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd starter/backend
-          docker build --tag $ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REPOSITORY:$IMAGE_TAG
+          docker build --tag ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} .
+          docker push ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
   deploy:
     name: Deploy to Kubernetes
@@ -62,5 +61,5 @@ jobs:
       - name: Update Image Tag in Kustomize
         run: |
           cd starter/backend/k8s
-          kustomize edit set image backend=$ECR_REPOSITORY:${{ github.sha }}
+          kustomize edit set image backend=${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           kustomize build | kubectl apply -f -
