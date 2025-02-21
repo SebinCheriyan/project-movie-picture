@@ -1,12 +1,12 @@
 name: Backend Continuous Deployment
 
 on:
-  # push:
+  # push: #To run on push event to the main brach where there is code change in backend folder.
   #   branches:
   #     - main
   #   paths:
   #     - 'starter/backend/**'
-  workflow_dispatch:  # Allows manual execution
+  workflow_dispatch:  #Allows manual execution
 
 env:
   AWS_REGION: us-east-1
@@ -63,3 +63,11 @@ jobs:
           cd starter/backend/k8s
           kustomize edit set image backend=${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           kustomize build | kubectl apply -f -
+
+      -name: Get the backend URL and set env variable to use in frontend workflow
+       id: fetch_backend_url
+       run: |
+         #Time Service be created and available.
+         sleep 60
+         BACKEND_URL=$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+         echo "BACKEND_URL=http://$BACKEND_URL" >> $GITHUB_ENV

@@ -1,12 +1,13 @@
 name: Frontend Continuous Integration
 
 on:
-  # pull_request:
+  # pull_request: #To run on pull_request to the main brach where there is code change in frontend folder.
   #   branches:
   #     - main
   #   paths:
   #     - 'starter/frontend/**'
-  workflow_dispatch:
+
+  workflow_dispatch: #To run manually
 
 jobs:
   lint:

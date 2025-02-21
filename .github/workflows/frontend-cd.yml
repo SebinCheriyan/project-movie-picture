@@ -1,7 +1,7 @@
 name: Frontend Continuous Deployment
 
 on:
-  # push:
+  # push: #To run run on push event to the main brach where there is code change in frontend folder.
   #   branches:
   #     - main
   #   paths:
