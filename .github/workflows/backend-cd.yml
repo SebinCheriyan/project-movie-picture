@@ -1,11 +1,11 @@
 name: Backend Continuous Deployment
 
 on:
-  # push: #To run on push event to the main brach where there is code change in backend folder.
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'starter/backend/**'
+  push: #To run on push event to the main brach where there is code change in backend folder.
+    branches:
+      - main
+    paths:
+      - 'starter/backend/**' #Trigger only when there is change in backend dirctory.
   workflow_dispatch:  #Allows manual execution
   
   # ECR repository urls are stored as enviroment variables (PROD) along with region and backend url. AWS secrets are also stored in the same PROD env.

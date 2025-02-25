@@ -1,11 +1,11 @@
 name: Backend Continuous Integration
 
 on:
-  # pull_request: #To run on pull_request to the main brach where there is code change in backend folder.
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'starter/backend/**'
+  pull_request: #To run on pull_request to the main brach where there is code change in backend folder.
+    branches:
+      - main
+    paths:
+      - 'starter/backend/**' #Trigger only when there is change in backend dirctory.
   workflow_dispatch:  # Allows manual execution
 
 jobs:
