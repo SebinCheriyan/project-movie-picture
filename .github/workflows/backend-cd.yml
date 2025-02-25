@@ -7,16 +7,12 @@ on:
   #   paths:
   #     - 'starter/backend/**'
   workflow_dispatch:  #Allows manual execution
-
-env:
-  AWS_REGION: us-east-1
-  AWS_ROLE: arn:aws:iam::352026621605:user/github-action-user
-  ECR_REPOSITORY: 352026621605.dkr.ecr.us-east-1.amazonaws.com/backend
-  IMAGE_TAG: ${{ github.sha }}
-
+  
+  # ECR repository urls are stored as enviroment variables (PROD) along with region and backend url. AWS secrets are also stored in the same PROD env.
 jobs:
   build:
     name: Build and Push Backend Image
+    environment: PROD
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -27,21 +23,22 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
         run: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REPOSITORY }}
+          aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ vars.BACKEND_ECR_REPOSITORY }}
 
       - name: Build and Push Docker Image
         run: |
           cd starter/backend
-          docker build --tag ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} .
-          docker push ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker build --tag ${{ vars.BACKEND_ECR_REPOSITORY }}:${{ github.sha }} .
+          docker push ${{ vars.BACKEND_ECR_REPOSITORY }}:${{ github.sha }}
 
   deploy:
     name: Deploy to Kubernetes
+    environment: PROD
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -53,21 +50,13 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name cluster
+        run: aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name cluster
 
       - name: Update Image Tag in Kustomize
         run: |
           cd starter/backend/k8s
-          kustomize edit set image backend=${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          kustomize edit set image backend=${{ vars.BACKEND_ECR_REPOSITORY }}:${{ github.sha }}
           kustomize build | kubectl apply -f -
-
-      -name: Get the backend URL and set env variable to use in frontend workflow
-       id: fetch_backend_url
-       run: |
-         #Time Service be created and available.
-         sleep 60
-         BACKEND_URL=$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-         echo "BACKEND_URL=http://$BACKEND_URL" >> $GITHUB_ENV
