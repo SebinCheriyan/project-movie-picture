@@ -61,6 +61,7 @@ jobs:
   build:
     name: Build and Push Frontend Image
     environment: PROD
+    needs: [lint, test]  # Run only if lint and test steps pass
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
