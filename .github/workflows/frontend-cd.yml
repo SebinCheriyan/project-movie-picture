@@ -10,6 +10,54 @@ on:
 
   # ECR repository urls are stored as enviroment variables (PROD) along with region and backend url. AWS secrets are also stored in the same PROD env.
 jobs:
+  lint:
+    name: Run Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm' #Cache action to restore cache before dependency install. This will speed up the workflow execution.
+          cache-dependency-path: starter/frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd starter/frontend
+          npm ci
+
+      - name: Run ESLint
+        run: |
+          cd starter/frontend
+          npm run lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm' #Cache action to restore cache before dependency install. This will speed up the workflow execution.
+          cache-dependency-path: starter/frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd starter/frontend
+          npm ci
+
+      - name: Run Tests
+        run: |
+          cd starter/frontend
+          CI=true npm test
+
   build:
     name: Build and Push Frontend Image
     environment: PROD

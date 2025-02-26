@@ -10,6 +10,52 @@ on:
   
   # ECR repository urls are stored as enviroment variables (PROD) along with region and backend url. AWS secrets are also stored in the same PROD env.
 jobs:
+  lint:
+    name: Run Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          cd starter/backend
+          pip install pipenv
+          pipenv install --dev #Specifically add --dev to install the dev-packages from Pipfile in starter/backend folder.
+
+      - name: Run Linter
+        run: |
+          cd starter/backend
+          pipenv run lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          cd starter/backend
+          pip install pipenv
+          pipenv install #No need to install dev packages as it using user defined tests.
+
+      - name: Run Tests
+        run: |
+          cd starter/backend
+          pipenv run test
+
   build:
     name: Build and Push Backend Image
     environment: PROD
